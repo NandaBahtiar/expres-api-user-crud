@@ -18,5 +18,14 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NandaBahtiar/expres-api-user-crud.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NandaBahtiar/expres-api-user-crud/issues"
+  },
+  "homepage": "https://github.com/NandaBahtiar/expres-api-user-crud#readme"
 }

@@ -1,0 +1,38 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+.report/
+
+# Lock files
+.lockb
+*.lock
+
+# Directory for instrumented libs collected by coverage tools in case of istanbul/v8
+.nyc_output/
+.nyc_tmp/
+
+# node-waf configuration
+.wafpickle-*
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependencies
+# Paths for pnpm (https://pnpm.io/)
+/node_modules
+/node_modules/*
+!/node_modules/.pnpm
+!/node_modules/.bin
+
+# dotenv environment variables file
+.env
+
+# Swagger output
+swagger-output.json
