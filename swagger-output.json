@@ -1,14 +1,14 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "My API",
-    "description": "Description",
+    "description": "Deskripsi API saya. Ini sudah dilengkapi dengan otentikasi JWT.",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
-  "basePath": "/",
-  "schemes": [
-    "http"
+  "servers": [
+    {
+      "url": "http://localhost:3000/"
+    }
   ],
   "paths": {
     "/users/": {
@@ -18,12 +18,16 @@
           {
             "name": "page",
             "in": "query",
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "limit",
             "in": "query",
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -43,26 +47,6 @@
       },
       "post": {
         "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "username": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -72,6 +56,26 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "example": "any"
+                  },
+                  "email": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -84,7 +88,9 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -106,7 +112,9 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -128,21 +136,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
             "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
+              "type": "string"
             }
           }
         ],
@@ -159,29 +154,29 @@
           "500": {
             "description": "Internal Server Error"
           }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
     "/users/login": {
       "post": {
         "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "username": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -192,8 +187,40 @@
           "500": {
             "description": "Internal Server Error"
           }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
-  }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Masukkan token JWT dari endpoint login untuk otentikasi."
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
 }

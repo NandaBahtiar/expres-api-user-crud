@@ -1,11 +1,13 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-
+import jwt from 'jsonwebtoken';
+import authenticateToken from "../middleware/auth.js";
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 const router = express.Router();
 
 const SALT_ROUNDS = 14;
 
-router.get('/', async (req, res) => {
+router.get('/',authenticateToken, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     if (page <= 0 || limit <= 0) {
@@ -43,7 +45,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
     try {
         const pool = req.db;
@@ -106,17 +108,33 @@ router.post('/login', async (req, res) => {
         if (!passwordCheck) {
             return res.status(401).json({ error: 'Invalid username or password.' });
         }
+        const payload = {
+            id: user.id,
+            username: user.username,
+            email: user.email
+            // Anda bisa menambahkan 'role' jika ada
+        };
+        const token = jwt.sign(
+            payload,
+            JWT_SECRET, // Kunci Rahasia
+            { expiresIn: '1h' } // Token kedaluwarsa dalam 1 jam
+        );
+
 
         delete user.password;
 
-        return res.status(200).json(user);
+        return res.status(200).json({
+            message: 'Login successful.',
+            token: token, // Klien akan menggunakan token ini untuk permintaan berikutnya
+            user: user    // Data pengguna yang sudah dibersihkan
+        });
     } catch (err) {
         console.error("Error during login:", err.message);
         res.status(500).send("Internal Server Error: " + err.message);
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
     try {
         const pool = req.db;
@@ -133,7 +151,7 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
     try {
         const pool = req.db;
