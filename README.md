@@ -9,20 +9,21 @@ This project is a RESTful API built with Express.js that performs complete CRUD 
 
 ## Features
 
-- **User Management**: Full CRUD functionality for user accounts.
-- **Secure Passwords**: Passwords are securely hashed using `bcrypt` before being stored.
-- **Authentication**: A simple login endpoint (`/users/login`) to verify user credentials.
-- **Pagination**: The `GET /users` endpoint supports pagination via query parameters (`page` and `limit`).
-- **API Documentation**: Interactive API documentation available through Swagger UI.
-- **Configuration**: Easy setup using environment variables for the server port and database connection.
+-   **User Management**: Full CRUD functionality for user accounts.
+-   **Secure Passwords**: Passwords are securely hashed using `bcrypt` before being stored.
+-   **JWT Authentication**: Secure user authentication using JSON Web Tokens (JWT) for protected routes.
+-   **Pagination**: The `GET /users` endpoint supports pagination via query parameters (`page` and `limit`).
+-   **API Documentation**: Interactive API documentation available through Swagger UI.
+-   **Configuration**: Easy setup using environment variables for the server port and database connection.
 
 ## Technologies Used
 
-- **Backend**: [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/)
-- **Password Hashing**: [bcrypt](https://www.npmjs.com/package/bcrypt)
-- **API Documentation**: [Swagger UI Express](https://www.npmjs.com/package/swagger-ui-express), [Swagger-Autogen](https://www.npmjs.com/package/swagger-autogen)
-- **Environment Variables**: [dotenv](https://www.npmjs.com/package/dotenv)
+-   **Backend**: [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/)
+-   **Database**: [PostgreSQL](https://www.postgresql.org/)
+-   **Password Hashing**: [bcrypt](https://www.npmjs.com/package/bcrypt)
+-   **API Documentation**: [Swagger UI Express](https://www.npmjs.com/package/swagger-ui-express), [Swagger-Autogen](https://www.npmjs.com/package/swagger-autogen)
+-   **Environment Variables**: [dotenv](https://www.npmjs.com/package/dotenv)
+-   **JWT**: [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 
 ## Getting Started
 
@@ -30,9 +31,9 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/en/download/) (v18.x or later recommended)
-- [npm](https://www.npmjs.com/get-npm)
-- A running [PostgreSQL](https://www.postgresql.org/download/) database instance.
+-   [Node.js](https://nodejs.org/en/download/) (v18.x or later recommended)
+-   [npm](https://www.npmjs.com/get-npm)
+-   A running [PostgreSQL](https://www.postgresql.org/download/) database instance.
 
 ### Installation
 
@@ -52,7 +53,7 @@ Follow these instructions to get a copy of the project up and running on your lo
     ```sh
     copy .env.example .env
     ```
-    Open the `.env` file and add your configuration details:
+    Open the `.env` file and add your configuration details, including a secret key for JWT:
     ```env
     # Server Port
     PORT=3000
@@ -60,6 +61,9 @@ Follow these instructions to get a copy of the project up and running on your lo
     # PostgreSQL Connection URL
     # Format: postgresql://USER:PASSWORD@HOST:PORT/DATABASE
     DATABASE_URL="your_database_connection_string"
+
+    # JWT Secret Key - Ganti dengan kunci rahasia yang kuat!
+    JWT_SECRET="supersecretkey"
     ```
 
 4.  **Initialize the Database:**
@@ -77,25 +81,72 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 ### Running the Application
 
-1.  **Start the server:**
+1.  **Generate Swagger Documentation:**
+    Before starting the server, generate the API documentation:
+    ```sh
+    node swagger.js
+    ```
+
+2.  **Start the server:**
     ```sh
     node index.js
     ```
     The server will start, and you will see a confirmation message in the console.
 
-2.  **Access API Documentation:**
+3.  **Access API Documentation:**
     Open your web browser and navigate to the following URL to view the interactive Swagger documentation:
     [http://localhost:3000/api-docs/](http://localhost:3000/api-docs/)
+
+## JWT Authentication
+
+This API uses JSON Web Tokens (JWT) for authenticating requests to protected endpoints.
+
+### Obtaining a Token
+
+To access protected routes, you first need to obtain a JWT by logging in:
+
+-   **Endpoint**: `POST /users/login`
+-   **Request Body**:
+    ```json
+    {
+        "username": "your_username",
+        "password": "your_password"
+    }
+    ```
+-   **Response**: If successful, the response will include a `token` field.
+
+### Using the Token
+
+Once you have a JWT, you must include it in the `Authorization` header of subsequent requests to protected endpoints.
+
+-   **Header Name**: `Authorization`
+-   **Header Value**: `Bearer <YOUR_JWT_TOKEN>`
+
+    **Example `curl` request to a protected endpoint:**
+    ```bash
+    curl -X GET http://localhost:3000/users \
+    -H "Authorization: Bearer <PASTE_YOUR_JWT_TOKEN_HERE>"
+    ```
+
+### Using JWT with Swagger UI
+
+1.  Navigate to the Swagger UI at `http://localhost:3000/api-docs/`.
+2.  Click the green **"Authorize"** button (usually in the top right).
+3.  In the pop-up window, locate the `bearerAuth` scheme.
+4.  Enter your JWT directly into the input field (you do not need to type "Bearer ", Swagger UI will add it automatically thanks to the OpenAPI 3.0 configuration).
+5.  Click "Authorize" and then "Close".
+6.  Now you can use "Try it out" on protected endpoints.
+
 
 ## API Endpoints
 
 All endpoints are prefixed with `/users`.
 
-| Method | Endpoint        | Description                                       |
-| ------ | --------------- | ------------------------------------------------- |
-| `GET`  | `/`             | Fetches a paginated list of all users.            |
-| `GET`  | `/:id`          | Fetches a single user by their ID.                |
-| `POST` | `/`             | Creates a new user.                               |
-| `POST` | `/login`        | Authenticates a user and returns their details.   |
-| `PUT`  | `/:id`          | Updates a user's information (email/password).    |
-| `DELETE`| `/:id`         | Deletes a user by their ID.                       |
+| Method | Endpoint        | Description                                       | Requires Auth | 
+| ------ | --------------- | ------------------------------------------------- | ------------- | 
+| `GET`  | `/`             | Fetches a paginated list of all users.            | Yes           | 
+| `GET`  | `/:id`          | Fetches a single user by their ID.                | Yes           | 
+| `POST` | `/`             | Creates a new user.                               | No            | 
+| `POST` | `/login`        | Authenticates a user and returns their details.   | No            | 
+| `PUT`  | `/:id`          | Updates a user's information (email/password).    | Yes           | 
+| `DELETE`| `/:id`         | Deletes a user by their ID.                       | Yes           | 
